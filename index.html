@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Yopiverso - Laive</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.20.0/xlsx.full.min.js"></script>
+    <title>Dashboard Yopiverso - Reporte Laive</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,1036 +13,699 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #151c3c 100%);
-            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            color: #333;
         }
 
         .header {
-            text-align: center;
-            margin-bottom: 40px;
-            animation: fadeInDown 0.8s ease-out;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header p {
-            color: #a0a0a0;
-            font-size: 1.2rem;
-        }
-
-        .controls {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
 
-        .control-group {
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
             gap: 20px;
+        }
+
+        .logo-section {
+            display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-
-        .file-upload-section {
-            display: flex;
-            flex-direction: column;
             gap: 15px;
         }
 
-        .file-status {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .file-status p {
-            margin: 0 0 10px 0;
-            color: #a0a0a0;
-            font-size: 0.9rem;
-        }
-
-        .file-indicators {
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border-radius: 12px;
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
         }
 
-        .file-indicator {
-            padding: 5px 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+        .title-section h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 5px;
         }
 
-        .file-indicator.loaded {
-            background: rgba(78, 205, 196, 0.2);
-            border-color: #4ecdc4;
-            color: #4ecdc4;
+        .title-section p {
+            color: #666;
+            font-size: 1.1em;
         }
 
-        .file-count {
-            font-size: 0.9rem;
-            color: #ffd93d;
-            margin: 5px 0 0 0;
+        .contact-info {
+            text-align: right;
+            color: #666;
         }
 
-        .success-message {
-            background: rgba(78, 205, 196, 0.2);
-            color: #4ecdc4;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            display: none;
-        }
-
-        .success-message.active {
+        .contact-info strong {
+            color: #2c3e50;
             display: block;
+            margin-bottom: 5px;
         }
 
-        .file-upload input[type="file"] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .file-upload label {
-            display: inline-block;
-            padding: 12px 24px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            color: white;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
+        .date-selector {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
-        .file-upload label:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        .date-selector label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #2c3e50;
         }
 
-        .date-filters {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .date-filters input[type="date"] {
+        .date-selector input {
             padding: 10px 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-radius: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             font-size: 16px;
+            transition: border-color 0.3s;
         }
 
-        .date-filters input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
-
-        .btn-filter {
-            padding: 10px 20px;
-            background: linear-gradient(45deg, #4ecdc4, #44a08d);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-filter:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+        .date-selector input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
 
         .metric-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
             padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
             text-align: center;
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.8s ease-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .metric-card:hover {
             transform: translateY(-5px);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
         }
 
         .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
             margin-bottom: 10px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         .metric-label {
-            color: #a0a0a0;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #666;
+            font-size: 1.1em;
+            font-weight: 500;
         }
 
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 30px;
             margin-bottom: 30px;
         }
 
         .chart-container {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: fadeInUp 0.8s ease-out;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .chart-container h3 {
+            color: #2c3e50;
             margin-bottom: 20px;
-            font-size: 1.3rem;
-            color: #ffffff;
+            text-align: center;
+            font-size: 1.3em;
         }
 
-        .data-table {
-            background: rgba(255, 255, 255, 0.05);
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+        }
+
+        .ads-summary {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow-x: auto;
-            animation: fadeInUp 0.8s ease-out;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        th {
-            background: rgba(255, 255, 255, 0.1);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-        }
-
-        tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-active {
-            background: rgba(78, 205, 196, 0.2);
-            color: #4ecdc4;
-        }
-
-        .status-completed {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #4ecdc4;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .error-message {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            display: none;
-        }
-
-        .error-message.active {
-            display: block;
-        }
-
-        .download-section {
-            background: rgba(78, 205, 196, 0.1);
-            border: 2px solid #4ecdc4;
-            border-radius: 20px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: center;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .download-container h3 {
-            color: #4ecdc4;
-            margin-bottom: 15px;
-        }
-
-        .download-container p {
-            color: #a0a0a0;
+        .ads-summary h3 {
+            color: #2c3e50;
             margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.4em;
         }
 
-        .btn-download {
-            padding: 15px 30px;
-            background: linear-gradient(45deg, #4ecdc4, #44a08d);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
+        .ads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
 
-        .btn-download:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(78, 205, 196, 0.4);
+        .ad-metric {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
         }
+
+        .ad-metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .ad-metric-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        .trend-indicator {
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .trend-up { color: #27ae60; }
+        .trend-down { color: #e74c3c; }
+        .trend-stable { color: #f39c12; }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .control-group {
+            .header-content {
                 flex-direction: column;
-                align-items: stretch;
+                text-align: center;
             }
-            
-            .date-filters {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            .date-filters input[type="date"] {
-                width: 100%;
-            }
-            
+
             .charts-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .metric-value {
+                font-size: 2em;
+            }
+
+            .title-section h1 {
+                font-size: 1.8em;
             }
         }
     </style>
 </head>
 <body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">Y</div>
+                <div class="title-section">
+                    <h1>Dashboard Yopiverso</h1>
+                    <p>Reporte de Desempeño - Roblox</p>
+                </div>
+            </div>
+            <div class="contact-info">
+                <strong>Sebastián Wagner</strong>
+                <div>Key Account Manager - Konektor Chile</div>
+                <div>📅 <a href="https://meetings.hubspot.com/sebastian592" style="color: #667eea;">Agendar reunión</a></div>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
-        <div class="header">
-            <h1>Dashboard Yopiverso</h1>
-            <p>Monitor de rendimiento de campaña - Laive</p>
+        <div class="date-selector">
+            <label for="dateSelect">📅 Seleccionar fecha:</label>
+            <input type="date" id="dateSelect" value="2025-06-14">
         </div>
 
-        <div class="controls">
-            <div class="control-group">
-                <div class="file-upload-section">
-                    <div class="file-upload">
-                        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" multiple>
-                        <label for="fileInput">📊 Cargar múltiples archivos (CSV/Excel)</label>
-                    </div>
-                    <div class="file-status" id="fileStatus">
-                        <p>Archivos esperados:</p>
-                        <div class="file-indicators">
-                            <span class="file-indicator" id="csvIndicator">📄 CSV Experiencia</span>
-                            <span class="file-indicator" id="excel1Indicator">📊 Excel Roblox 1</span>
-                            <span class="file-indicator" id="excel2Indicator">📊 Excel Roblox 2</span>
-                        </div>
-                        <p class="file-count" id="fileCount">Selecciona los 3 archivos simultáneamente</p>
-                    </div>
-                </div>
-                
-                <div class="date-filters">
-                    <label>Desde:</label>
-                    <input type="date" id="startDate">
-                    <label>Hasta:</label>
-                    <input type="date" id="endDate">
-                    <button class="btn-filter" onclick="applyFilters()">Filtrar</button>
-                    <button class="btn-filter" onclick="resetFilters()">Resetear</button>
-                    <div style="margin-top: 10px; font-size: 0.85rem; color: #a0a0a0;">
-                        <span id="dateRangeInfo">Mostrando todos los datos disponibles</span>
-                    </div>
-                </div>
-            </div>
-            <div class="loading" id="loading">Cargando datos...</div>
-            <div class="error-message" id="errorMessage"></div>
-            <div class="success-message" id="successMessage"></div>
-        </div>
-
-        <div class="metrics-grid" id="metricsGrid">
+        <div class="metrics-grid">
             <div class="metric-card">
-                <div class="metric-value" id="totalUsers">0</div>
-                <div class="metric-label">Usuarios Activos (Período)</div>
+                <div class="metric-icon" style="background: linear-gradient(45deg, #FF6B6B, #FF8E53);">👥</div>
+                <div class="metric-value" id="usuariosActivos">4,903</div>
+                <div class="metric-label">Usuarios Activos Diarios</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="newUsers">0</div>
-                <div class="metric-label">Nuevos Usuarios (Período)</div>
+                <div class="metric-icon" style="background: linear-gradient(45deg, #4ECDC4, #44A08D);">✨</div>
+                <div class="metric-value" id="nuevosUsuarios">3,956</div>
+                <div class="metric-label">Nuevos Usuarios</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="totalVisits">0</div>
-                <div class="metric-label">Visitas (Período)</div>
+                <div class="metric-icon" style="background: linear-gradient(45deg, #A8E6CF, #7FCDCD);">🎯</div>
+                <div class="metric-value" id="visitasTotales">133,400</div>
+                <div class="metric-label">Visitas Totales</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="avgSessionTime">0</div>
-                <div class="metric-label">Tiempo Sesión Prom. (min)</div>
+                <div class="metric-icon" style="background: linear-gradient(45deg, #FFB6C1, #FFA0AC);">⏱️</div>
+                <div class="metric-value" id="tiempoSesion">3.5 min</div>
+                <div class="metric-label">Tiempo Sesión Promedio</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="avgRetention">0%</div>
-                <div class="metric-label">Retención Día 1 Prom.</div>
+                <div class="metric-icon" style="background: linear-gradient(45deg, #FFEAA7, #FDCB6E);">📈</div>
+                <div class="metric-value" id="retencion">3%</div>
+                <div class="metric-label">Retención Día 1</div>
             </div>
         </div>
 
         <div class="charts-grid">
             <div class="chart-container">
-                <h3>📈 Usuarios Activos Diarios</h3>
-                <canvas id="usersChart"></canvas>
+                <h3>📊 Evolución de Usuarios Activos</h3>
+                <div class="chart-wrapper">
+                    <canvas id="usuariosChart"></canvas>
+                </div>
             </div>
             <div class="chart-container">
-                <h3>📊 Visitas Totales</h3>
-                <canvas id="visitsChart"></canvas>
+                <h3>🎮 Crecimiento de Visitas Totales</h3>
+                <div class="chart-wrapper">
+                    <canvas id="visitasChart"></canvas>
+                </div>
             </div>
         </div>
 
         <div class="charts-grid">
             <div class="chart-container">
-                <h3>⏱️ Tiempo de Sesión Promedio</h3>
-                <canvas id="sessionChart"></canvas>
+                <h3>🔄 Retención vs Tiempo de Sesión</h3>
+                <div class="chart-wrapper">
+                    <canvas id="retencionChart"></canvas>
+                </div>
             </div>
             <div class="chart-container">
-                <h3>🔄 Retención Día 1</h3>
-                <canvas id="retentionChart"></canvas>
+                <h3>👥 Comparativa Usuarios</h3>
+                <div class="chart-wrapper">
+                    <canvas id="comparativaChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="data-table" id="campaignsTableContainer">
-            <h3>📊 Campañas de Roblox Ads</h3>
-            <div style="overflow-x: auto;">
-                <table id="campaignsTable">
-                    <thead>
-                        <tr>
-                            <th>Campaña</th>
-                            <th>Objetivo</th>
-                            <th>Presupuesto</th>
-                            <th>Gastado</th>
-                            <th>Impresiones</th>
-                            <th>Plays</th>
-                            <th>CPP</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="campaignsBody">
-                        <tr>
-                            <td colspan="8" style="text-align: center; color: #a0a0a0;">
-                                No hay datos de campañas cargados
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="ads-summary">
+            <h3>📢 Resumen de Campañas Publicitarias</h3>
+            <div class="ads-grid">
+                <div class="ad-metric">
+                    <div class="ad-metric-value" id="totalSpent">$4,511.93</div>
+                    <div class="ad-metric-label">Total Invertido (USD)</div>
+                </div>
+                <div class="ad-metric">
+                    <div class="ad-metric-value" id="totalImpressions">16.7M</div>
+                    <div class="ad-metric-label">Total Impresiones</div>
+                </div>
+                <div class="ad-metric">
+                    <div class="ad-metric-value" id="avgCTR">1.2%</div>
+                    <div class="ad-metric-label">CTR Promedio</div>
+                </div>
+                <div class="ad-metric">
+                    <div class="ad-metric-value" id="totalPlays">80,241</div>
+                    <div class="ad-metric-label">Total Plays Generados</div>
+                </div>
+                <div class="ad-metric">
+                    <div class="ad-metric-value" id="avgCPP">$0.056</div>
+                    <div class="ad-metric-label">Costo por Play Promedio</div>
+                </div>
+                <div class="ad-metric">
+                    <div class="ad-metric-value" id="avgPlayRate">0.38%</div>
+                    <div class="ad-metric-label">Tasa de Play Promedio</div>
+                </div>
             </div>
         </div>
 
-        <div class="download-section" id="downloadSection" style="display: none;">
-            <div class="download-container">
-                <h3>💾 Actualizar Datos en GitHub</h3>
-                <p>Los datos han sido procesados exitosamente. Descarga el archivo data.json y súbelo a tu repositorio de GitHub para que todos puedan ver los datos actualizados.</p>
-                <button class="btn-download" id="downloadBtn">📥 Descargar data.json</button>
-            </div>
+        <div class="last-updated">
+            📅 Última actualización: <span id="lastUpdate">14 de Junio, 2025</span>
         </div>
     </div>
 
     <script>
-        // Variables globales
-        let experienceData = [];
-        let campaignsData = [];
-        let charts = {};
-        const DATA_URL = './data.json'; // URL del archivo JSON en el mismo directorio
+        // Datos iniciales del CSV
+        const yopiversoData = [
+            {fecha: "2025-05-25", usuariosActivos: 9, nuevosUsuarios: 8, tiempoSesion: 9.0, retencion: 0.01, visitasTotales: 219},
+            {fecha: "2025-05-26", usuariosActivos: 146, nuevosUsuarios: 8, tiempoSesion: 8.1, retencion: 0.02, visitasTotales: 3700},
+            {fecha: "2025-05-27", usuariosActivos: 874, nuevosUsuarios: 1203, tiempoSesion: 7.8, retencion: 0.03, visitasTotales: 13000},
+            {fecha: "2025-05-28", usuariosActivos: 1806, nuevosUsuarios: 1747, tiempoSesion: 6.0, retencion: 0.04, visitasTotales: 18200},
+            {fecha: "2025-05-29", usuariosActivos: 2096, nuevosUsuarios: 1747, tiempoSesion: 5.7, retencion: 0.04, visitasTotales: 23800},
+            {fecha: "2025-05-30", usuariosActivos: 3023, nuevosUsuarios: 2591, tiempoSesion: 5.4, retencion: 0.04, visitasTotales: 29200},
+            {fecha: "2025-06-01", usuariosActivos: 3691, nuevosUsuarios: 3077, tiempoSesion: 4.2, retencion: 0.04, visitasTotales: 34700},
+            {fecha: "2025-06-02", usuariosActivos: 4261, nuevosUsuarios: 3975, tiempoSesion: 3.6, retencion: 0.04, visitasTotales: 46500},
+            {fecha: "2025-06-03", usuariosActivos: 5081, nuevosUsuarios: 4692, tiempoSesion: 3.6, retencion: 0.04, visitasTotales: 52900},
+            {fecha: "2025-06-04", usuariosActivos: 5038, nuevosUsuarios: 4565, tiempoSesion: 3.6, retencion: 0.03, visitasTotales: 61600},
+            {fecha: "2025-06-05", usuariosActivos: 6073, nuevosUsuarios: 5332, tiempoSesion: 3.4, retencion: 0.04, visitasTotales: 79500},
+            {fecha: "2025-06-06", usuariosActivos: 6073, nuevosUsuarios: 5332, tiempoSesion: 3.4, retencion: 0.04, visitasTotales: 81200},
+            {fecha: "2025-06-07", usuariosActivos: 6401, nuevosUsuarios: 5892, tiempoSesion: 3.4, retencion: 0.04, visitasTotales: 94100},
+            {fecha: "2025-06-08", usuariosActivos: 6729, nuevosUsuarios: 6023, tiempoSesion: 3.3, retencion: 0.04, visitasTotales: 103800},
+            {fecha: "2025-06-09", usuariosActivos: 7832, nuevosUsuarios: 6577, tiempoSesion: 3.2, retencion: 0.04, visitasTotales: 115300},
+            {fecha: "2025-06-10", usuariosActivos: 7462, nuevosUsuarios: 6188, tiempoSesion: 3.2, retencion: 0.04, visitasTotales: 120100},
+            {fecha: "2025-06-11", usuariosActivos: 7282, nuevosUsuarios: 5994, tiempoSesion: 3.2, retencion: 0.04, visitasTotales: 124400},
+            {fecha: "2025-06-12", usuariosActivos: 6732, nuevosUsuarios: 5488, tiempoSesion: 3.3, retencion: 0.04, visitasTotales: 127600},
+            {fecha: "2025-06-13", usuariosActivos: 5828, nuevosUsuarios: 4714, tiempoSesion: 3.4, retencion: 0.04, visitasTotales: 130000},
+            {fecha: "2025-06-14", usuariosActivos: 4903, nuevosUsuarios: 3956, tiempoSesion: 3.5, retencion: 0.03, visitasTotales: 133400}
+        ];
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDataFromJSON();
-            initializeCharts();
-            setupEventListeners();
-        });
+        // Configuración de gráficos
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+        Chart.defaults.color = '#666';
 
-        function setupEventListeners() {
-            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
-        }
+        let usuariosChart, visitasChart, retencionChart, comparativaChart;
 
-        async function loadDataFromJSON() {
-            try {
-                const response = await fetch(DATA_URL);
-                if (response.ok) {
-                    const data = await response.json();
-                    experienceData = data.experienceData || [];
-                    campaignsData = data.campaignsData || [];
-                    
-                    if (experienceData.length > 0) {
-                        updateDashboard();
-                    }
-                    if (campaignsData.length > 0) {
-                        updateCampaignsTable();
-                    }
-                } else {
-                    // Si no existe el archivo, intentar cargar de localStorage como fallback
-                    loadStoredData();
-                }
-            } catch (error) {
-                console.error('Error cargando datos JSON:', error);
-                // Fallback a localStorage
-                loadStoredData();
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + 'K';
             }
+            return num.toLocaleString();
         }
 
-        function loadStoredData() {
-            const storedExperience = localStorage.getItem('yopiverso_experience_data');
-            const storedCampaigns = localStorage.getItem('yopiverso_campaigns_data');
-            
-            if (storedExperience) {
-                experienceData = JSON.parse(storedExperience);
-                updateDashboard();
-            }
-            
-            if (storedCampaigns) {
-                campaignsData = JSON.parse(storedCampaigns);
-                updateCampaignsTable();
-            }
-        }
-
-        function saveDataLocally() {
-            // Guardar en localStorage
-            localStorage.setItem('yopiverso_experience_data', JSON.stringify(experienceData));
-            localStorage.setItem('yopiverso_campaigns_data', JSON.stringify(campaignsData));
-            
-            // Mostrar sección de descarga si hay datos
-            if (experienceData.length > 0 || campaignsData.length > 0) {
-                document.getElementById('downloadSection').style.display = 'block';
-                
-                // Configurar botón de descarga
-                const downloadBtn = document.getElementById('downloadBtn');
-                downloadBtn.onclick = function() {
-                    const jsonData = {
-                        lastUpdated: new Date().toISOString().split('T')[0],
-                        experienceData: experienceData,
-                        campaignsData: campaignsData
-                    };
-                    
-                    const jsonStr = JSON.stringify(jsonData, null, 2);
-                    const blob = new Blob([jsonStr], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'data.json';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    // Mostrar mensaje de éxito
-                    const successMsg = document.getElementById('successMessage');
-                    successMsg.textContent = '✅ Archivo data.json descargado. Súbelo a tu repositorio de GitHub.';
-                    successMsg.classList.add('active');
-                    setTimeout(() => successMsg.classList.remove('active'), 5000);
-                };
-            }
-        }
-
-        function handleFileUpload(event) {
-            const files = event.target.files;
-            const loading = document.getElementById('loading');
-            const errorMsg = document.getElementById('errorMessage');
-            const successMsg = document.getElementById('successMessage');
-            const fileCount = document.getElementById('fileCount');
-            
-            // Resetear indicadores
-            document.querySelectorAll('.file-indicator').forEach(el => el.classList.remove('loaded'));
-            
-            if (files.length === 0) return;
-            
-            loading.classList.add('active');
-            errorMsg.classList.remove('active');
-            successMsg.classList.remove('active');
-            
-            fileCount.textContent = `${files.length} archivo(s) seleccionado(s)`;
-            
-            let filesProcessed = 0;
-            let csvFound = false;
-            let excelFound = 0;
-            
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    const data = e.target.result;
-                    
-                    if (file.name.endsWith('.csv')) {
-                        processCSV(data);
-                        csvFound = true;
-                        document.getElementById('csvIndicator').classList.add('loaded');
-                    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                        processExcel(data);
-                        excelFound++;
-                        if (excelFound === 1) {
-                            document.getElementById('excel1Indicator').classList.add('loaded');
-                        } else if (excelFound === 2) {
-                            document.getElementById('excel2Indicator').classList.add('loaded');
-                        }
-                    }
-                    
-                    filesProcessed++;
-                    
-                    // Cuando se procesen todos los archivos
-                    if (filesProcessed === files.length) {
-                        loading.classList.remove('active');
-                        
-                        if (csvFound && excelFound >= 2) {
-                            successMsg.textContent = '✅ ¡Todos los archivos cargados exitosamente! Dashboard actualizado.';
-                            successMsg.classList.add('active');
-                            fileCount.textContent = '¡Carga completa! Los 3 archivos fueron procesados';
-                            fileCount.style.color = '#4ecdc4';
-                        } else {
-                            let missing = [];
-                            if (!csvFound) missing.push('CSV de Experiencia');
-                            if (excelFound < 2) missing.push(`${2 - excelFound} archivo(s) Excel de Roblox`);
-                            
-                            errorMsg.textContent = `⚠️ Faltan archivos: ${missing.join(', ')}`;
-                            errorMsg.classList.add('active');
-                        }
-                        
-                        setTimeout(() => {
-                            successMsg.classList.remove('active');
-                            errorMsg.classList.remove('active');
-                        }, 5000);
-                    }
-                };
-                
-                if (file.name.endsWith('.csv')) {
-                    reader.readAsText(file);
-                } else {
-                    reader.readAsArrayBuffer(file);
-                }
-            });
-        }
-
-        function processCSV(data) {
-            Papa.parse(data, {
-                header: true,
-                dynamicTyping: false, // Cambiado a false para mejor control
-                skipEmptyLines: true,
-                complete: function(results) {
-                    // Limpiar y procesar datos con mejor manejo de formatos
-                    const cleanedData = results.data.map(row => {
-                        // Función helper para convertir números con coma decimal
-                        const parseNumber = (value) => {
-                            if (!value) return 0;
-                            return parseFloat(String(value).replace(/\./g, '').replace(',', '.')) || 0;
-                        };
-                        
-                        return {
-                            fecha: row.Fecha,
-                            usuariosActivos: parseNumber(row['Usuarios activos diarios']),
-                            nuevosUsuarios: parseNumber(row['nuevos usuarios']),
-                            tiempoSesion: parseNumber(row['tiempo de sesión promedio']),
-                            retencion: parseNumber(row['retención día 1']),
-                            visitasTotales: parseInt(String(row['Visitas Totales']).replace(/\./g, '')) || 0
-                        };
-                    }).filter(row => row.fecha); // Filtrar filas vacías
-                    
-                    experienceData = cleanedData;
-                    saveDataLocally();
-                    updateDashboard();
-                }
-            });
-        }
-
-        function processExcel(data) {
-            try {
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const sheet = workbook.Sheets[sheetName];
-                const jsonData = XLSX.utils.sheet_to_json(sheet);
-                
-                // Procesar datos de campañas
-                const campaigns = jsonData.map(row => ({
-                    name: row['Campaign Name'] || '',
-                    objective: row['Objective'] || '',
-                    budget: parseFloat(row['Budget']) || 0,
-                    spent: parseFloat(row['Spent']) || 0,
-                    impressions: parseInt(row['Impressions']) || 0,
-                    plays: parseInt(row['Plays']) || 0,
-                    cpp: parseFloat(row['CPP']) || 0,
-                    startDate: row['Start Date'] || '',
-                    endDate: row['End Date'] || '',
-                    ctr: parseFloat(row['CTR']) || 0,
-                    cpc: parseFloat(row['CPC']) || 0
-                }));
-                
-                // Combinar campañas de ambos archivos Excel
-                if (campaignsData.length === 0) {
-                    campaignsData = campaigns;
-                } else {
-                    // Agregar nuevas campañas sin duplicar
-                    campaigns.forEach(newCampaign => {
-                        const exists = campaignsData.some(c => c.name === newCampaign.name);
-                        if (!exists) {
-                            campaignsData.push(newCampaign);
-                        }
-                    });
-                }
-                
-                saveDataLocally();
-                updateCampaignsTable();
-            } catch (error) {
-                console.error('Error procesando Excel:', error);
-                showError('Error procesando archivo Excel');
-            }
-        }
-
-        function applyFilters() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            
-            if (!startDate || !endDate) {
-                showError('Por favor seleccione ambas fechas');
-                return;
-            }
-            
-            updateDashboard(startDate, endDate);
-        }
-
-        function resetFilters() {
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            updateDashboard();
-        }
-
-        function showError(message) {
-            const errorMsg = document.getElementById('errorMessage');
-            errorMsg.textContent = message;
-            errorMsg.classList.add('active');
-            setTimeout(() => {
-                errorMsg.classList.remove('active');
-            }, 3000);
-        }
-
-        function updateDashboard(startDate = null, endDate = null) {
-            let filteredData = experienceData;
-            const dateInfo = document.getElementById('dateRangeInfo');
-            
-            if (startDate && endDate) {
-                filteredData = experienceData.filter(row => {
-                    const date = parseDate(row.fecha);
-                    const start = new Date(startDate);
-                    const end = new Date(endDate);
-                    return date >= start && date <= end;
-                });
-                
-                // Actualizar información del rango
-                const startFormatted = new Date(startDate).toLocaleDateString('es-CL');
-                const endFormatted = new Date(endDate).toLocaleDateString('es-CL');
-                dateInfo.textContent = `Mostrando datos del ${startFormatted} al ${endFormatted} (${filteredData.length} días)`;
-            } else {
-                dateInfo.textContent = `Mostrando todos los datos disponibles (${filteredData.length} días)`;
-            }
-            
-            if (filteredData.length === 0) {
-                showError('No hay datos para el rango seleccionado');
-                return;
-            }
-            
-            updateMetrics(filteredData);
-            updateCharts(filteredData);
-        }
-
-        function parseDate(dateStr) {
-            const [day, month, year] = dateStr.split('/');
-            return new Date(year, month - 1, day);
-        }
-
-        function updateMetrics(data) {
-            if (data.length === 0) {
-                // Resetear todas las métricas a 0
-                document.getElementById('totalUsers').textContent = '0';
-                document.getElementById('newUsers').textContent = '0';
-                document.getElementById('totalVisits').textContent = '0';
-                document.getElementById('avgSessionTime').textContent = '0';
-                document.getElementById('avgRetention').textContent = '0%';
-                return;
-            }
-            
-            // Para períodos de múltiples días:
-            // - Usuarios activos: promedio del período (no se suman porque un usuario puede estar activo varios días)
-            // - Nuevos usuarios: suma del período (cada día son usuarios únicos nuevos)
-            // - Visitas: suma del período
-            // - Tiempo de sesión: promedio del período
-            // - Retención: promedio del período
-            
-            const avgActiveUsers = Math.round(data.reduce((sum, row) => sum + row.usuariosActivos, 0) / data.length);
-            const totalNewUsers = data.reduce((sum, row) => sum + row.nuevosUsuarios, 0);
-            const totalVisits = data.reduce((sum, row) => sum + row.visitasTotales, 0);
-            const avgSession = data.reduce((sum, row) => sum + row.tiempoSesion, 0) / data.length;
-            const avgRetention = (data.reduce((sum, row) => sum + row.retencion, 0) / data.length) * 100;
-            
-            // Si es un solo día, mostrar valores exactos
-            if (data.length === 1) {
-                document.getElementById('totalUsers').textContent = data[0].usuariosActivos.toLocaleString();
-                document.getElementById('newUsers').textContent = data[0].nuevosUsuarios.toLocaleString();
-                document.getElementById('totalVisits').textContent = data[0].visitasTotales.toLocaleString();
-                document.getElementById('avgSessionTime').textContent = data[0].tiempoSesion.toFixed(1);
-                document.getElementById('avgRetention').textContent = (data[0].retencion * 100).toFixed(1) + '%';
-            } else {
-                // Para múltiples días, mostrar agregados apropiados
-                document.getElementById('totalUsers').textContent = avgActiveUsers.toLocaleString();
-                document.getElementById('newUsers').textContent = totalNewUsers.toLocaleString();
-                document.getElementById('totalVisits').textContent = totalVisits.toLocaleString();
-                document.getElementById('avgSessionTime').textContent = avgSession.toFixed(1);
-                document.getElementById('avgRetention').textContent = avgRetention.toFixed(1) + '%';
-            }
-        }
-
-        function initializeCharts() {
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#ffffff'
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            color: '#a0a0a0'
-                        },
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            color: '#a0a0a0'
-                        },
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        }
-                    }
-                }
-            };
-            
-            // Gráfico de usuarios
-            const usersCtx = document.getElementById('usersChart').getContext('2d');
-            charts.users = new Chart(usersCtx, {
+        function initCharts() {
+            // Gráfico de Usuarios Activos
+            const ctxUsuarios = document.getElementById('usuariosChart').getContext('2d');
+            usuariosChart = new Chart(ctxUsuarios, {
                 type: 'line',
                 data: {
-                    labels: [],
+                    labels: yopiversoData.map(d => {
+                        const date = new Date(d.fecha);
+                        return date.toLocaleDateString('es-ES', {month: 'short', day: 'numeric'});
+                    }),
                     datasets: [{
-                        label: 'Usuarios Activos',
-                        data: [],
-                        borderColor: '#ff6b6b',
-                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Nuevos Usuarios',
-                        data: [],
-                        borderColor: '#4ecdc4',
-                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        label: 'Usuarios Activos Diarios',
+                        data: yopiversoData.map(d => d.usuariosActivos),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
                         tension: 0.4
                     }]
                 },
-                options: chartOptions
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
             });
-            
-            // Gráfico de visitas
-            const visitsCtx = document.getElementById('visitsChart').getContext('2d');
-            charts.visits = new Chart(visitsCtx, {
+
+            // Gráfico de Visitas Totales
+            const ctxVisitas = document.getElementById('visitasChart').getContext('2d');
+            visitasChart = new Chart(ctxVisitas, {
                 type: 'bar',
                 data: {
-                    labels: [],
+                    labels: yopiversoData.map(d => {
+                        const date = new Date(d.fecha);
+                        return date.toLocaleDateString('es-ES', {month: 'short', day: 'numeric'});
+                    }),
                     datasets: [{
                         label: 'Visitas Totales',
-                        data: [],
-                        backgroundColor: 'rgba(78, 205, 196, 0.6)',
-                        borderColor: '#4ecdc4',
+                        data: yopiversoData.map(d => d.visitasTotales),
+                        backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                        borderColor: '#4CAF50',
                         borderWidth: 2
                     }]
                 },
-                options: chartOptions
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
             });
-            
-            // Gráfico de tiempo de sesión
-            const sessionCtx = document.getElementById('sessionChart').getContext('2d');
-            charts.session = new Chart(sessionCtx, {
+
+            // Gráfico de Retención vs Tiempo de Sesión
+            const ctxRetencion = document.getElementById('retencionChart').getContext('2d');
+            retencionChart = new Chart(ctxRetencion, {
                 type: 'line',
                 data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Tiempo de Sesión (min)',
-                        data: [],
-                        borderColor: '#ffd93d',
-                        backgroundColor: 'rgba(255, 217, 61, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: chartOptions
-            });
-            
-            // Gráfico de retención
-            const retentionCtx = document.getElementById('retentionChart').getContext('2d');
-            charts.retention = new Chart(retentionCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
+                    labels: yopiversoData.map(d => {
+                        const date = new Date(d.fecha);
+                        return date.toLocaleDateString('es-ES', {month: 'short', day: 'numeric'});
+                    }),
                     datasets: [{
                         label: 'Retención Día 1 (%)',
-                        data: [],
-                        borderColor: '#a29bfe',
-                        backgroundColor: 'rgba(162, 155, 254, 0.1)',
-                        tension: 0.4
+                        data: yopiversoData.map(d => d.retencion * 100),
+                        borderColor: '#FF6B6B',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        borderWidth: 3,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Tiempo de Sesión (min)',
+                        data: yopiversoData.map(d => d.tiempoSesion),
+                        borderColor: '#4ECDC4',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 3,
+                        yAxisID: 'y1'
                     }]
                 },
-                options: chartOptions
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Retención (%)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Tiempo (min)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico Comparativo
+            const ctxComparativa = document.getElementById('comparativaChart').getContext('2d');
+            comparativaChart = new Chart(ctxComparativa, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Usuarios Activos', 'Nuevos Usuarios'],
+                    datasets: [{
+                        data: [
+                            yopiversoData[yopiversoData.length - 1].usuariosActivos,
+                            yopiversoData[yopiversoData.length - 1].nuevosUsuarios
+                        ],
+                        backgroundColor: ['#667eea', '#764ba2'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
             });
         }
 
-        function updateCharts(data) {
-            const labels = data.map(row => row.fecha);
-            
-            // Actualizar gráfico de usuarios
-            charts.users.data.labels = labels;
-            charts.users.data.datasets[0].data = data.map(row => row.usuariosActivos);
-            charts.users.data.datasets[1].data = data.map(row => row.nuevosUsuarios);
-            charts.users.update();
-            
-            // Actualizar gráfico de visitas
-            charts.visits.data.labels = labels;
-            charts.visits.data.datasets[0].data = data.map(row => row.visitasTotales);
-            charts.visits.update();
-            
-            // Actualizar gráfico de tiempo de sesión
-            charts.session.data.labels = labels;
-            charts.session.data.datasets[0].data = data.map(row => row.tiempoSesion);
-            charts.session.update();
-            
-            // Actualizar gráfico de retención
-            charts.retention.data.labels = labels;
-            charts.retention.data.datasets[0].data = data.map(row => row.retencion * 100);
-            charts.retention.update();
-        }
-
-        function updateCampaignsTable() {
-            const tbody = document.getElementById('campaignsBody');
-            const container = document.getElementById('campaignsTableContainer');
-            
-            if (campaignsData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" style="text-align: center; color: #a0a0a0;">
-                            No hay datos de campañas cargados
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            tbody.innerHTML = '';
-            
-            campaignsData.forEach(campaign => {
-                const row = document.createElement('tr');
-                const isActive = !campaign.endDate || new Date(campaign.endDate) > new Date();
+        function updateMetrics(selectedDate) {
+            const dataPoint = yopiversoData.find(d => d.fecha === selectedDate);
+            if (dataPoint) {
+                document.getElementById('usuariosActivos').textContent = formatNumber(dataPoint.usuariosActivos);
+                document.getElementById('nuevosUsuarios').textContent = formatNumber(dataPoint.nuevosUsuarios);
+                document.getElementById('visitasTotales').textContent = formatNumber(dataPoint.visitasTotales);
+                document.getElementById('tiempoSesion').textContent = dataPoint.tiempoSesion.toFixed(1) + ' min';
+                document.getElementById('retencion').textContent = (dataPoint.retencion * 100).toFixed(0) + '%';
                 
-                row.innerHTML = `
-                    <td>${campaign.name}</td>
-                    <td>${campaign.objective}</td>
-                    <td>${campaign.budget.toLocaleString()}</td>
-                    <td>${campaign.spent.toFixed(2)}</td>
-                    <td>${campaign.impressions.toLocaleString()}</td>
-                    <td>${campaign.plays.toLocaleString()}</td>
-                    <td>${campaign.cpp.toFixed(3)}</td>
-                    <td><span class="status-badge ${isActive ? 'status-active' : 'status-completed'}">${isActive ? 'Activa' : 'Completada'}</span></td>
-                `;
-                tbody.appendChild(row);
+                // Actualizar gráfico comparativo
+                comparativaChart.data.datasets[0].data = [
+                    dataPoint.usuariosActivos,
+                    dataPoint.nuevosUsuarios
+                ];
+                comparativaChart.update();
+            }
+        }
+
+        // Función para cargar datos desde JSON (para actualizaciones futuras)
+        async function loadDataFromJSON() {
+            try {
+                const response = await fetch('./data.json');
+                if (response.ok) {
+                    const newData = await response.json();
+                    yopiversoData.length = 0;
+                    yopiversoData.push(...newData.yopiverso);
+                    
+                    // Actualizar gráficos
+                    updateAllCharts();
+                    
+                    // Actualizar métricas
+                    const latestDate = yopiversoData[yopiversoData.length - 1].fecha;
+                    document.getElementById('dateSelect').value = latestDate;
+                    updateMetrics(latestDate);
+                    
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
+            } catch (error) {
+                console.log('No se pudo cargar data.json, usando datos por defecto');
+            }
+        }
+
+        function updateAllCharts() {
+            const labels = yopiversoData.map(d => {
+                const date = new Date(d.fecha);
+                return date.toLocaleDateString('es-ES', {month: 'short', day: 'numeric'});
             });
+
+            // Actualizar gráfico de usuarios
+            usuariosChart.data.labels = labels;
+            usuariosChart.data.datasets[0].data = yopiversoData.map(d => d.usuariosActivos);
+            usuariosChart.update();
+
+            // Actualizar gráfico de visitas
+            visitasChart.data.labels = labels;
+            visitasChart.data.datasets[0].data = yopiversoData.map(d => d.visitasTotales);
+            visitasChart.update();
+
+            // Actualizar gráfico de retención
+            retencionChart.data.labels = labels;
+            retencionChart.data.datasets[0].data = yopiversoData.map(d => d.retencion * 100);
+            retencionChart.data.datasets[1].data = yopiversoData.map(d => d.tiempoSesion);
+            retencionChart.update();
+        }
+
+        // Event listeners
+        document.getElementById('dateSelect').addEventListener('change', function(e) {
+            updateMetrics(e.target.value);
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            loadDataFromJSON();
             
-            // Asegurar que la tabla sea visible
-            container.style.display = 'block';
+            // Intentar cargar datos cada 5 minutos
+            setInterval(loadDataFromJSON, 5 * 60 * 1000);
+        });
+
+        // Función para exportar datos como JSON (para desarrollo)
+        function exportData() {
+            const dataToExport = {
+                yopiverso: yopiversoData,
+                lastUpdate: new Date().toISOString(),
+                adsData: {
+                    totalSpent: 4511.93,
+                    totalImpressions: 16700000,
+                    avgCTR: 1.2,
+                    totalPlays: 80241,
+                    avgCPP: 0.056,
+                    avgPlayRate: 0.38
+                }
+            };
+            
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'data.json';
+            link.click();
+        }
+
+        // Añadir botón de exportación (solo visible en desarrollo)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const exportBtn = document.createElement('button');
+            exportBtn.textContent = 'Exportar Datos';
+            exportBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 1000; padding: 10px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;';
+            exportBtn.onclick = exportData;
+            document.body.appendChild(exportBtn);
         }
     </script>
 </body>
