@@ -1,0 +1,203 @@
+{
+  "yopiverso": [
+    {
+      "fecha": "2025-05-25",
+      "usuariosActivos": 9,
+      "nuevosUsuarios": 8,
+      "tiempoSesion": 9.0,
+      "retencion": 0.01,
+      "visitasTotales": 219
+    },
+    {
+      "fecha": "2025-05-26",
+      "usuariosActivos": 146,
+      "nuevosUsuarios": 8,
+      "tiempoSesion": 8.1,
+      "retencion": 0.02,
+      "visitasTotales": 3700
+    },
+    {
+      "fecha": "2025-05-27",
+      "usuariosActivos": 874,
+      "nuevosUsuarios": 1203,
+      "tiempoSesion": 7.8,
+      "retencion": 0.03,
+      "visitasTotales": 13000
+    },
+    {
+      "fecha": "2025-05-28",
+      "usuariosActivos": 1806,
+      "nuevosUsuarios": 1747,
+      "tiempoSesion": 6.0,
+      "retencion": 0.04,
+      "visitasTotales": 18200
+    },
+    {
+      "fecha": "2025-05-29",
+      "usuariosActivos": 2096,
+      "nuevosUsuarios": 1747,
+      "tiempoSesion": 5.7,
+      "retencion": 0.04,
+      "visitasTotales": 23800
+    },
+    {
+      "fecha": "2025-05-30",
+      "usuariosActivos": 3023,
+      "nuevosUsuarios": 2591,
+      "tiempoSesion": 5.4,
+      "retencion": 0.04,
+      "visitasTotales": 29200
+    },
+    {
+      "fecha": "2025-06-01",
+      "usuariosActivos": 3691,
+      "nuevosUsuarios": 3077,
+      "tiempoSesion": 4.2,
+      "retencion": 0.04,
+      "visitasTotales": 34700
+    },
+    {
+      "fecha": "2025-06-02",
+      "usuariosActivos": 4261,
+      "nuevosUsuarios": 3975,
+      "tiempoSesion": 3.6,
+      "retencion": 0.04,
+      "visitasTotales": 46500
+    },
+    {
+      "fecha": "2025-06-03",
+      "usuariosActivos": 5081,
+      "nuevosUsuarios": 4692,
+      "tiempoSesion": 3.6,
+      "retencion": 0.04,
+      "visitasTotales": 52900
+    },
+    {
+      "fecha": "2025-06-04",
+      "usuariosActivos": 5038,
+      "nuevosUsuarios": 4565,
+      "tiempoSesion": 3.6,
+      "retencion": 0.03,
+      "visitasTotales": 61600
+    },
+    {
+      "fecha": "2025-06-05",
+      "usuariosActivos": 6073,
+      "nuevosUsuarios": 5332,
+      "tiempoSesion": 3.4,
+      "retencion": 0.04,
+      "visitasTotales": 79500
+    },
+    {
+      "fecha": "2025-06-06",
+      "usuariosActivos": 6073,
+      "nuevosUsuarios": 5332,
+      "tiempoSesion": 3.4,
+      "retencion": 0.04,
+      "visitasTotales": 81200
+    },
+    {
+      "fecha": "2025-06-07",
+      "usuariosActivos": 6401,
+      "nuevosUsuarios": 5892,
+      "tiempoSesion": 3.4,
+      "retencion": 0.04,
+      "visitasTotales": 94100
+    },
+    {
+      "fecha": "2025-06-08",
+      "usuariosActivos": 6729,
+      "nuevosUsuarios": 6023,
+      "tiempoSesion": 3.3,
+      "retencion": 0.04,
+      "visitasTotales": 103800
+    },
+    {
+      "fecha": "2025-06-09",
+      "usuariosActivos": 7832,
+      "nuevosUsuarios": 6577,
+      "tiempoSesion": 3.2,
+      "retencion": 0.04,
+      "visitasTotales": 115300
+    },
+    {
+      "fecha": "2025-06-10",
+      "usuariosActivos": 7462,
+      "nuevosUsuarios": 6188,
+      "tiempoSesion": 3.2,
+      "retencion": 0.04,
+      "visitasTotales": 120100
+    },
+    {
+      "fecha": "2025-06-11",
+      "usuariosActivos": 7282,
+      "nuevosUsuarios": 5994,
+      "tiempoSesion": 3.2,
+      "retencion": 0.04,
+      "visitasTotales": 124400
+    },
+    {
+      "fecha": "2025-06-12",
+      "usuariosActivos": 6732,
+      "nuevosUsuarios": 5488,
+      "tiempoSesion": 3.3,
+      "retencion": 0.04,
+      "visitasTotales": 127600
+    },
+    {
+      "fecha": "2025-06-13",
+      "usuariosActivos": 5828,
+      "nuevosUsuarios": 4714,
+      "tiempoSesion": 3.4,
+      "retencion": 0.04,
+      "visitasTotales": 130000
+    },
+    {
+      "fecha": "2025-06-14",
+      "usuariosActivos": 4903,
+      "nuevosUsuarios": 3956,
+      "tiempoSesion": 3.5,
+      "retencion": 0.03,
+      "visitasTotales": 133400
+    }
+  ],
+  "lastUpdate": "2025-06-14T00:00:00Z",
+  "adsData": {
+    "totalSpent": 4511.93,
+    "totalImpressions": 16700000,
+    "avgCTR": 1.2,
+    "totalPlays": 80241,
+    "avgCPP": 0.056,
+    "avgPlayRate": 0.38,
+    "campaigns": [
+      {
+        "name": "Maximize Plays_Yopiverso",
+        "type": "Maximize Plays",
+        "spent": 3775.82,
+        "impressions": 11810274,
+        "plays": 44601
+      },
+      {
+        "name": "Portal Ads",
+        "type": "Visits",
+        "spent": 449.41,
+        "impressions": 61058,
+        "plays": 34231
+      },
+      {
+        "name": "Sponsored Ads",
+        "type": "Visits",
+        "spent": 195.41,
+        "impressions": 1456905,
+        "plays": 3359
+      },
+      {
+        "name": "Awareness Campaign",
+        "type": "Awareness",
+        "spent": 91.29,
+        "impressions": 45646,
+        "plays": 0
+      }
+    ]
+  }
+}
