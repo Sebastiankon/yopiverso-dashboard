@@ -474,16 +474,42 @@
         let experienceData = [];
         let campaignsData = [];
         let charts = {};
+        const DATA_URL = './data.json'; // URL del archivo JSON en el mismo directorio
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
-            loadStoredData();
+            loadDataFromJSON();
             initializeCharts();
             setupEventListeners();
         });
 
         function setupEventListeners() {
             document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+        }
+
+        async function loadDataFromJSON() {
+            try {
+                const response = await fetch(DATA_URL);
+                if (response.ok) {
+                    const data = await response.json();
+                    experienceData = data.experienceData || [];
+                    campaignsData = data.campaignsData || [];
+                    
+                    if (experienceData.length > 0) {
+                        updateDashboard();
+                    }
+                    if (campaignsData.length > 0) {
+                        updateCampaignsTable();
+                    }
+                } else {
+                    // Si no existe el archivo, intentar cargar de localStorage como fallback
+                    loadStoredData();
+                }
+            } catch (error) {
+                console.error('Error cargando datos JSON:', error);
+                // Fallback a localStorage
+                loadStoredData();
+            }
         }
 
         function loadStoredData() {
@@ -499,6 +525,37 @@
                 campaignsData = JSON.parse(storedCampaigns);
                 updateCampaignsTable();
             }
+        }
+
+        function saveDataLocally() {
+            // Guardar en localStorage
+            localStorage.setItem('yopiverso_experience_data', JSON.stringify(experienceData));
+            localStorage.setItem('yopiverso_campaigns_data', JSON.stringify(campaignsData));
+            
+            // Generar archivo JSON para descargar
+            const jsonData = {
+                lastUpdated: new Date().toISOString().split('T')[0],
+                experienceData: experienceData,
+                campaignsData: campaignsData
+            };
+            
+            // Mostrar botón de descarga
+            showDownloadButton(jsonData);
+        }
+
+        function showDownloadButton(data) {
+            const successMsg = document.getElementById('successMessage');
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            successMsg.innerHTML = `
+                ✅ ¡Datos actualizados! 
+                <a href="${url}" download="data.json" style="color: #4ecdc4; text-decoration: underline; margin-left: 10px;">
+                    📥 Descargar data.json para actualizar en GitHub
+                </a>
+            `;
+            successMsg.classList.add('active');
         }
 
         function handleFileUpload(event) {
@@ -597,7 +654,7 @@
                     });
                     
                     experienceData = cleanedData;
-                    localStorage.setItem('yopiverso_experience_data', JSON.stringify(experienceData));
+                    saveDataLocally();
                     updateDashboard();
                 }
             });
@@ -626,7 +683,7 @@
             
             // En lugar de concatenar, reemplazar los datos para evitar duplicados
             campaignsData = campaigns;
-            localStorage.setItem('yopiverso_campaigns_data', JSON.stringify(campaignsData));
+            saveDataLocally();
             updateCampaignsTable();
         }
 
@@ -684,12 +741,13 @@
         }
 
         function updateMetrics(data) {
-            const totalUsers = data.reduce((sum, row) => sum + row.usuariosActivos, 0);
+            // Corregir el cálculo de usuarios totales - usar el máximo valor, no la suma
+            const maxUsers = Math.max(...data.map(row => row.usuariosActivos));
             const totalVisits = data.reduce((sum, row) => sum + row.visitasTotales, 0);
             const avgSession = data.reduce((sum, row) => sum + row.tiempoSesion, 0) / data.length;
             const avgRetention = (data.reduce((sum, row) => sum + row.retencion, 0) / data.length) * 100;
             
-            document.getElementById('totalUsers').textContent = totalUsers.toLocaleString();
+            document.getElementById('totalUsers').textContent = maxUsers.toLocaleString();
             document.getElementById('totalVisits').textContent = totalVisits.toLocaleString();
             document.getElementById('avgSessionTime').textContent = avgSession.toFixed(1);
             document.getElementById('avgRetention').textContent = avgRetention.toFixed(1) + '%';
