@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Yopiverso - Reporte Laive</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -28,7 +29,7 @@
         }
 
         .header-content {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -79,18 +80,28 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
         }
 
-        .date-selector {
+        .controls-section {
             background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
             margin-bottom: 30px;
-            text-align: center;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .date-selector {
+            text-align: center;
         }
 
         .date-selector label {
@@ -110,6 +121,62 @@
         .date-selector input:focus {
             outline: none;
             border-color: #667eea;
+        }
+
+        .file-upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .file-upload-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .upload-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .upload-group label {
+            font-size: 0.9em;
+            color: #666;
+            min-width: 120px;
+        }
+
+        .upload-group input[type="file"] {
+            padding: 8px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        .upload-group input[type="file"]:hover {
+            border-color: #667eea;
+        }
+
+        .update-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .update-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .update-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .metrics-grid {
@@ -202,6 +269,36 @@
             font-size: 1.4em;
         }
 
+        .ads-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .ads-tab {
+            padding: 10px 20px;
+            border: none;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .ads-tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .ads-content {
+            display: none;
+        }
+
+        .ads-content.active {
+            display: block;
+        }
+
         .ads-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -216,6 +313,14 @@
             border-left: 4px solid #667eea;
         }
 
+        .ad-metric.classic {
+            border-left-color: #FF6B6B;
+        }
+
+        .ad-metric.new {
+            border-left-color: #4ECDC4;
+        }
+
         .ad-metric-value {
             font-size: 1.8em;
             font-weight: bold;
@@ -228,6 +333,12 @@
             margin-top: 5px;
         }
 
+        .comparison-chart {
+            grid-column: 1 / -1;
+            height: 300px;
+            margin-top: 20px;
+        }
+
         .last-updated {
             text-align: center;
             color: #666;
@@ -235,16 +346,39 @@
             margin-top: 20px;
         }
 
-        .trend-indicator {
-            font-size: 0.8em;
-            margin-left: 10px;
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
         }
 
-        .trend-up { color: #27ae60; }
-        .trend-down { color: #e74c3c; }
-        .trend-stable { color: #f39c12; }
+        .notification.error {
+            background: #f44336;
+        }
+
+        .notification.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
 
         @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
             .header-content {
                 flex-direction: column;
                 text-align: center;
@@ -265,6 +399,8 @@
     </style>
 </head>
 <body>
+    <div class="notification" id="notification"></div>
+
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
@@ -283,9 +419,30 @@
     </header>
 
     <div class="container">
-        <div class="date-selector">
-            <label for="dateSelect">📅 Seleccionar fecha:</label>
-            <input type="date" id="dateSelect" value="2025-06-14">
+        <div class="controls-section">
+            <div class="controls-grid">
+                <div class="date-selector">
+                    <label for="dateSelect">📅 Seleccionar fecha:</label>
+                    <input type="date" id="dateSelect" value="2025-06-14">
+                </div>
+                
+                <div class="file-upload-section">
+                    <h3>🔄 Actualizar Datos</h3>
+                    <div class="upload-group">
+                        <label>CSV Yopiverso:</label>
+                        <input type="file" id="csvFile" accept=".csv" />
+                    </div>
+                    <div class="upload-group">
+                        <label>Excel Classic Ads:</label>
+                        <input type="file" id="classicAdsFile" accept=".xlsx,.xls" />
+                    </div>
+                    <div class="upload-group">
+                        <label>Excel New Ads:</label>
+                        <input type="file" id="newAdsFile" accept=".xlsx,.xls" />
+                    </div>
+                    <button class="update-button" onclick="updateData()">Actualizar Dashboard</button>
+                </div>
+            </div>
         </div>
 
         <div class="metrics-grid">
@@ -347,31 +504,97 @@
         </div>
 
         <div class="ads-summary">
-            <h3>📢 Resumen de Campañas Publicitarias</h3>
-            <div class="ads-grid">
-                <div class="ad-metric">
-                    <div class="ad-metric-value" id="totalSpent">$4,511.93</div>
-                    <div class="ad-metric-label">Total Invertido (USD)</div>
+            <h3>📢 Desempeño de Campañas Publicitarias</h3>
+            
+            <div class="ads-tabs">
+                <button class="ads-tab active" onclick="switchAdsTab('combined')">📊 Vista Combinada</button>
+                <button class="ads-tab" onclick="switchAdsTab('classic')">🎯 Classic Ads</button>
+                <button class="ads-tab" onclick="switchAdsTab('new')">🚀 New Ads</button>
+                <button class="ads-tab" onclick="switchAdsTab('comparison')">⚖️ Comparación</button>
+            </div>
+
+            <div id="combinedAds" class="ads-content active">
+                <div class="ads-grid">
+                    <div class="ad-metric">
+                        <div class="ad-metric-value" id="totalSpentCombined">$5,501.90</div>
+                        <div class="ad-metric-label">Total Invertido (USD)</div>
+                    </div>
+                    <div class="ad-metric">
+                        <div class="ad-metric-value" id="totalImpressionsCombined">17.5M</div>
+                        <div class="ad-metric-label">Total Impresiones</div>
+                    </div>
+                    <div class="ad-metric">
+                        <div class="ad-metric-value" id="avgCTRCombined">1.1%</div>
+                        <div class="ad-metric-label">CTR Promedio</div>
+                    </div>
+                    <div class="ad-metric">
+                        <div class="ad-metric-value" id="totalPlaysCombined">81,941</div>
+                        <div class="ad-metric-label">Total Plays Generados</div>
+                    </div>
                 </div>
-                <div class="ad-metric">
-                    <div class="ad-metric-value" id="totalImpressions">16.7M</div>
-                    <div class="ad-metric-label">Total Impresiones</div>
+            </div>
+
+            <div id="classicAds" class="ads-content">
+                <div class="ads-grid">
+                    <div class="ad-metric classic">
+                        <div class="ad-metric-value" id="totalSpentClassic">$1,586.63</div>
+                        <div class="ad-metric-label">Total Invertido (USD)</div>
+                    </div>
+                    <div class="ad-metric classic">
+                        <div class="ad-metric-value" id="totalImpressionsClassic">1.6M</div>
+                        <div class="ad-metric-label">Total Impresiones</div>
+                    </div>
+                    <div class="ad-metric classic">
+                        <div class="ad-metric-value" id="avgCTRClassic">0.37%</div>
+                        <div class="ad-metric-label">CTR Promedio</div>
+                    </div>
+                    <div class="ad-metric classic">
+                        <div class="ad-metric-value" id="totalPlaysClassic">37,340</div>
+                        <div class="ad-metric-label">Total Plays</div>
+                    </div>
+                    <div class="ad-metric classic">
+                        <div class="ad-metric-value" id="avgCPPClassic">$0.037</div>
+                        <div class="ad-metric-label">Costo por Play</div>
+                    </div>
+                    <div class="ad-metric classic">
+                        <div class="ad-metric-value" id="avgPlayRateClassic">30.7%</div>
+                        <div class="ad-metric-label">Tasa de Play</div>
+                    </div>
                 </div>
-                <div class="ad-metric">
-                    <div class="ad-metric-value" id="avgCTR">1.2%</div>
-                    <div class="ad-metric-label">CTR Promedio</div>
+            </div>
+
+            <div id="newAds" class="ads-content">
+                <div class="ads-grid">
+                    <div class="ad-metric new">
+                        <div class="ad-metric-value" id="totalSpentNew">$3,915.27</div>
+                        <div class="ad-metric-label">Total Invertido (USD)</div>
+                    </div>
+                    <div class="ad-metric new">
+                        <div class="ad-metric-value" id="totalImpressionsNew">16.0M</div>
+                        <div class="ad-metric-label">Total Impresiones</div>
+                    </div>
+                    <div class="ad-metric new">
+                        <div class="ad-metric-value" id="avgCTRNew">1.28%</div>
+                        <div class="ad-metric-label">CTR Promedio</div>
+                    </div>
+                    <div class="ad-metric new">
+                        <div class="ad-metric-value" id="totalPlaysNew">44,601</div>
+                        <div class="ad-metric-label">Total Plays</div>
+                    </div>
+                    <div class="ad-metric new">
+                        <div class="ad-metric-value" id="avgCPPNew">$0.085</div>
+                        <div class="ad-metric-label">Costo por Play</div>
+                    </div>
+                    <div class="ad-metric new">
+                        <div class="ad-metric-value" id="avgPlayRateNew">28.6%</div>
+                        <div class="ad-metric-label">Tasa de Play</div>
+                    </div>
                 </div>
-                <div class="ad-metric">
-                    <div class="ad-metric-value" id="totalPlays">80,241</div>
-                    <div class="ad-metric-label">Total Plays Generados</div>
-                </div>
-                <div class="ad-metric">
-                    <div class="ad-metric-value" id="avgCPP">$0.056</div>
-                    <div class="ad-metric-label">Costo por Play Promedio</div>
-                </div>
-                <div class="ad-metric">
-                    <div class="ad-metric-value" id="avgPlayRate">0.38%</div>
-                    <div class="ad-metric-label">Tasa de Play Promedio</div>
+            </div>
+
+            <div id="comparisonAds" class="ads-content">
+                <div class="chart-wrapper comparison-chart">
+                    <canvas id="adsComparisonChart"></canvas>
                 </div>
             </div>
         </div>
@@ -382,8 +605,8 @@
     </div>
 
     <script>
-        // Datos iniciales del CSV
-        const yopiversoData = [
+        // Datos iniciales
+        let yopiversoData = [
             {fecha: "2025-05-25", usuariosActivos: 9, nuevosUsuarios: 8, tiempoSesion: 9.0, retencion: 0.01, visitasTotales: 219},
             {fecha: "2025-05-26", usuariosActivos: 146, nuevosUsuarios: 8, tiempoSesion: 8.1, retencion: 0.02, visitasTotales: 3700},
             {fecha: "2025-05-27", usuariosActivos: 874, nuevosUsuarios: 1203, tiempoSesion: 7.8, retencion: 0.03, visitasTotales: 13000},
@@ -406,11 +629,34 @@
             {fecha: "2025-06-14", usuariosActivos: 4903, nuevosUsuarios: 3956, tiempoSesion: 3.5, retencion: 0.03, visitasTotales: 133400}
         ];
 
+        let classicAdsData = {
+            totalSpent: 1586.63,
+            totalImpressions: 1563167,
+            totalClicks: 14945,
+            totalPlays: 37340,
+            avgCTR: 0.367,
+            avgCPP: 0.037,
+            avgPlayRate: 30.748,
+            campaigns: []
+        };
+
+        let newAdsData = {
+            totalSpent: 3915.27,
+            totalImpressions: 15965058,
+            totalClicks: 199122,
+            totalPlays: 44601,
+            avgCTR: 1.284,
+            avgCPP: 0.085,
+            avgPlayRate: 0.286,
+            campaigns: []
+        };
+
+        // Variables para los gráficos
+        let usuariosChart, visitasChart, retencionChart, comparativaChart, adsComparisonChart;
+
         // Configuración de gráficos
         Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
         Chart.defaults.color = '#666';
-
-        let usuariosChart, visitasChart, retencionChart, comparativaChart;
 
         function formatNumber(num) {
             if (num >= 1000000) {
@@ -419,6 +665,168 @@
                 return (num / 1000).toFixed(0) + 'K';
             }
             return num.toLocaleString();
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : ''} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim()) {
+                    const values = lines[i].split(',');
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        if (values[index]) {
+                            row[header] = values[index].trim();
+                        }
+                    });
+                    if (Object.keys(row).length > 0) {
+                        data.push(row);
+                    }
+                }
+            }
+            return data;
+        }
+
+        function cleanNumber(str) {
+            if (typeof str === 'number') return str;
+            if (typeof str === 'string') {
+                // Remover comillas y limpiar el número
+                const cleaned = str.replace(/"/g, '').replace(/,/g, '.').replace(/[^\d.-]/g, '');
+                return parseFloat(cleaned) || 0;
+            }
+            return 0;
+        }
+
+        function convertCSVToYopiverso(csvData) {
+            return csvData.map(row => {
+                const convertDate = (dateStr) => {
+                    const [day, month, year] = dateStr.split('/');
+                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                };
+
+                return {
+                    fecha: convertDate(row.Fecha || row.fecha),
+                    usuariosActivos: cleanNumber(row['Usuarios activos diarios']),
+                    nuevosUsuarios: cleanNumber(row['nuevos usuarios']),
+                    tiempoSesion: cleanNumber(row['tiempo de sesión promedio']),
+                    retencion: cleanNumber(row['retención día 1']),
+                    visitasTotales: cleanNumber(row['Visitas Totales'])
+                };
+            });
+        }
+
+        function calculateAdsMetrics(campaigns) {
+            if (!campaigns || campaigns.length === 0) {
+                return {
+                    totalSpent: 0,
+                    totalImpressions: 0,
+                    totalClicks: 0,
+                    totalPlays: 0,
+                    avgCTR: 0,
+                    avgCPP: 0,
+                    avgPlayRate: 0
+                };
+            }
+
+            const totals = campaigns.reduce((acc, campaign) => {
+                acc.totalSpent += cleanNumber(campaign.Spent);
+                acc.totalImpressions += cleanNumber(campaign.Impressions);
+                acc.totalClicks += cleanNumber(campaign.Clicks);
+                acc.totalPlays += cleanNumber(campaign.Plays);
+                return acc;
+            }, { totalSpent: 0, totalImpressions: 0, totalClicks: 0, totalPlays: 0 });
+
+            return {
+                ...totals,
+                avgCTR: campaigns.reduce((sum, c) => sum + cleanNumber(c.CTR), 0) / campaigns.length,
+                avgCPP: campaigns.reduce((sum, c) => sum + cleanNumber(c.CPP), 0) / campaigns.length,
+                avgPlayRate: campaigns.reduce((sum, c) => sum + cleanNumber(c['Play Rate']), 0) / campaigns.length,
+                campaigns: campaigns
+            };
+        }
+
+        async function updateData() {
+            const csvFile = document.getElementById('csvFile').files[0];
+            const classicFile = document.getElementById('classicAdsFile').files[0];
+            const newFile = document.getElementById('newAdsFile').files[0];
+
+            let updated = false;
+
+            try {
+                // Actualizar datos de Yopiverso desde CSV
+                if (csvFile) {
+                    const csvText = await csvFile.text();
+                    const csvData = parseCSV(csvText);
+                    const newYopiversoData = convertCSVToYopiverso(csvData);
+                    
+                    if (newYopiversoData.length > 0) {
+                        yopiversoData = newYopiversoData;
+                        updated = true;
+                        showNotification('✅ Datos de Yopiverso actualizados');
+                    }
+                }
+
+                // Actualizar New Ads desde Excel
+                if (newFile) {
+                    const arrayBuffer = await newFile.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer);
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const campaigns = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    newAdsData = calculateAdsMetrics(campaigns);
+                    updated = true;
+                    showNotification('✅ New Ads actualizados');
+                }
+
+                // Actualizar Classic Ads desde Excel
+                if (classicFile) {
+                    const arrayBuffer = await classicFile.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer);
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const campaigns = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    classicAdsData = calculateAdsMetrics(campaigns);
+                    updated = true;
+                    showNotification('✅ Classic Ads actualizados');
+                }
+
+                if (updated) {
+                    // Actualizar todos los componentes del dashboard
+                    updateAllCharts();
+                    updateAllMetrics();
+                    updateAdsMetrics();
+                    
+                    // Actualizar fecha de última actualización
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    // Limpiar inputs de archivo
+                    document.getElementById('csvFile').value = '';
+                    document.getElementById('classicAdsFile').value = '';
+                    document.getElementById('newAdsFile').value = '';
+                }
+
+            } catch (error) {
+                console.error('Error updating data:', error);
+                showNotification('❌ Error al actualizar datos: ' + error.message, true);
+            }
         }
 
         function initCharts() {
@@ -444,23 +852,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0,0,0,0.1)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -485,23 +880,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0,0,0,0.1)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -539,28 +921,16 @@
                             type: 'linear',
                             display: true,
                             position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Retención (%)'
-                            }
+                            title: { display: true, text: 'Retención (%)' }
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Tiempo (min)'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
+                            title: { display: true, text: 'Tiempo (min)' },
+                            grid: { drawOnChartArea: false }
                         },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -583,10 +953,52 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Gráfico de Comparación de Ads
+            const ctxAdsComparison = document.getElementById('adsComparisonChart').getContext('2d');
+            adsComparisonChart = new Chart(ctxAdsComparison, {
+                type: 'bar',
+                data: {
+                    labels: ['Inversión (USD)', 'Impresiones (M)', 'Plays (K)', 'CTR (%)', 'CPP ($)'],
+                    datasets: [{
+                        label: 'Classic Ads',
+                        data: [
+                            classicAdsData.totalSpent / 1000,
+                            classicAdsData.totalImpressions / 1000000,
+                            classicAdsData.totalPlays / 1000,
+                            classicAdsData.avgCTR,
+                            classicAdsData.avgCPP * 100
+                        ],
+                        backgroundColor: 'rgba(255, 107, 107, 0.8)',
+                        borderColor: '#FF6B6B',
+                        borderWidth: 2
+                    }, {
+                        label: 'New Ads',
+                        data: [
+                            newAdsData.totalSpent / 1000,
+                            newAdsData.totalImpressions / 1000000,
+                            newAdsData.totalPlays / 1000,
+                            newAdsData.avgCTR,
+                            newAdsData.avgCPP * 100
+                        ],
+                        backgroundColor: 'rgba(78, 205, 196, 0.8)',
+                        borderColor: '#4ECDC4',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
+                        title: { display: true, text: 'Comparación Classic vs New Ads' },
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -601,7 +1013,7 @@
                 document.getElementById('tiempoSesion').textContent = dataPoint.tiempoSesion.toFixed(1) + ' min';
                 document.getElementById('retencion').textContent = (dataPoint.retencion * 100).toFixed(0) + '%';
                 
-                // Actualizar gráfico comparativo
+                // Actualizar gráfico comparativo solo para la fecha seleccionada
                 comparativaChart.data.datasets[0].data = [
                     dataPoint.usuariosActivos,
                     dataPoint.nuevosUsuarios
@@ -610,31 +1022,59 @@
             }
         }
 
-        // Función para cargar datos desde JSON (para actualizaciones futuras)
-        async function loadDataFromJSON() {
-            try {
-                const response = await fetch('./data.json');
-                if (response.ok) {
-                    const newData = await response.json();
-                    yopiversoData.length = 0;
-                    yopiversoData.push(...newData.yopiverso);
-                    
-                    // Actualizar gráficos
-                    updateAllCharts();
-                    
-                    // Actualizar métricas
-                    const latestDate = yopiversoData[yopiversoData.length - 1].fecha;
-                    document.getElementById('dateSelect').value = latestDate;
-                    updateMetrics(latestDate);
-                    
-                    document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                }
-            } catch (error) {
-                console.log('No se pudo cargar data.json, usando datos por defecto');
+        function updateAllMetrics() {
+            const latestData = yopiversoData[yopiversoData.length - 1];
+            if (latestData) {
+                document.getElementById('dateSelect').value = latestData.fecha;
+                updateMetrics(latestData.fecha);
+            }
+        }
+
+        function updateAdsMetrics() {
+            // Vista combinada
+            const combinedSpent = classicAdsData.totalSpent + newAdsData.totalSpent;
+            const combinedImpressions = classicAdsData.totalImpressions + newAdsData.totalImpressions;
+            const combinedPlays = classicAdsData.totalPlays + newAdsData.totalPlays;
+            const combinedCTR = (classicAdsData.avgCTR + newAdsData.avgCTR) / 2;
+
+            document.getElementById('totalSpentCombined').textContent = ' + formatNumber(combinedSpent);
+            document.getElementById('totalImpressionsCombined').textContent = formatNumber(combinedImpressions);
+            document.getElementById('avgCTRCombined').textContent = combinedCTR.toFixed(2) + '%';
+            document.getElementById('totalPlaysCombined').textContent = formatNumber(combinedPlays);
+
+            // Classic Ads
+            document.getElementById('totalSpentClassic').textContent = ' + formatNumber(classicAdsData.totalSpent);
+            document.getElementById('totalImpressionsClassic').textContent = formatNumber(classicAdsData.totalImpressions);
+            document.getElementById('avgCTRClassic').textContent = classicAdsData.avgCTR.toFixed(2) + '%';
+            document.getElementById('totalPlaysClassic').textContent = formatNumber(classicAdsData.totalPlays);
+            document.getElementById('avgCPPClassic').textContent = ' + classicAdsData.avgCPP.toFixed(3);
+            document.getElementById('avgPlayRateClassic').textContent = classicAdsData.avgPlayRate.toFixed(1) + '%';
+
+            // New Ads
+            document.getElementById('totalSpentNew').textContent = ' + formatNumber(newAdsData.totalSpent);
+            document.getElementById('totalImpressionsNew').textContent = formatNumber(newAdsData.totalImpressions);
+            document.getElementById('avgCTRNew').textContent = newAdsData.avgCTR.toFixed(2) + '%';
+            document.getElementById('totalPlaysNew').textContent = formatNumber(newAdsData.totalPlays);
+            document.getElementById('avgCPPNew').textContent = ' + newAdsData.avgCPP.toFixed(3);
+            document.getElementById('avgPlayRateNew').textContent = newAdsData.avgPlayRate.toFixed(1) + '%';
+
+            // Actualizar gráfico de comparación
+            if (adsComparisonChart) {
+                adsComparisonChart.data.datasets[0].data = [
+                    classicAdsData.totalSpent / 1000,
+                    classicAdsData.totalImpressions / 1000000,
+                    classicAdsData.totalPlays / 1000,
+                    classicAdsData.avgCTR,
+                    classicAdsData.avgCPP * 100
+                ];
+                adsComparisonChart.data.datasets[1].data = [
+                    newAdsData.totalSpent / 1000,
+                    newAdsData.totalImpressions / 1000000,
+                    newAdsData.totalPlays / 1000,
+                    newAdsData.avgCTR,
+                    newAdsData.avgCPP * 100
+                ];
+                adsComparisonChart.update();
             }
         }
 
@@ -661,6 +1101,16 @@
             retencionChart.update();
         }
 
+        function switchAdsTab(tabName) {
+            // Remover clase active de todos los tabs y contenidos
+            document.querySelectorAll('.ads-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.ads-content').forEach(content => content.classList.remove('active'));
+
+            // Activar el tab y contenido seleccionado
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Ads').classList.add('active');
+        }
+
         // Event listeners
         document.getElementById('dateSelect').addEventListener('change', function(e) {
             updateMetrics(e.target.value);
@@ -669,44 +1119,8 @@
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
             initCharts();
-            loadDataFromJSON();
-            
-            // Intentar cargar datos cada 5 minutos
-            setInterval(loadDataFromJSON, 5 * 60 * 1000);
+            updateAdsMetrics();
         });
-
-        // Función para exportar datos como JSON (para desarrollo)
-        function exportData() {
-            const dataToExport = {
-                yopiverso: yopiversoData,
-                lastUpdate: new Date().toISOString(),
-                adsData: {
-                    totalSpent: 4511.93,
-                    totalImpressions: 16700000,
-                    avgCTR: 1.2,
-                    totalPlays: 80241,
-                    avgCPP: 0.056,
-                    avgPlayRate: 0.38
-                }
-            };
-            
-            const dataStr = JSON.stringify(dataToExport, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'data.json';
-            link.click();
-        }
-
-        // Añadir botón de exportación (solo visible en desarrollo)
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            const exportBtn = document.createElement('button');
-            exportBtn.textContent = 'Exportar Datos';
-            exportBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 1000; padding: 10px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;';
-            exportBtn.onclick = exportData;
-            document.body.appendChild(exportBtn);
-        }
     </script>
 </body>
 </html>
